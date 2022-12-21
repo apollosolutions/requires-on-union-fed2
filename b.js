@@ -5,23 +5,20 @@ import { buildSubgraphSchema } from '@apollo/subgraph';
 
 export async function buildSubgraph(port) {
   const typeDefs = gql`
-    extend schema
-      @link(url: "https://specs.apollo.dev/federation/v2.0", import: ["@key", "@external", "@requires", "@shareable"])
-
     union FeedItem = ItemA
 
-    type ItemA @shareable {
-      activity: Activity @external
+    type ItemA {
+      activity: Activity
     }
 
-    type Activity @key(fields: "id") {
-      id: ID!
+    extend type Activity @key(fields: "id name") {
+      id: ID! @external
       name: String @external
     }
 
-    type A @key(fields: "id") {
-      id: ID!
-      feed: [FeedItem!]! @external
+    extend type A @key(fields: "id") {
+      id: ID! @external
+      feed: [FeedItem!]!
       bar: String @requires(fields: "feed { ... on ItemA { activity { id name }}}")
     }
   `;
